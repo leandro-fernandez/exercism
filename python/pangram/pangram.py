@@ -1,8 +1,4 @@
+from string import ascii_lowercase
+
 def is_pangram(sentence):
-    alphabet = "abcdefghijklmnopqrstuvxyz"
-
-    for letter in sentence:
-      if (letter.isalpha() and letter.lower() in alphabet):
-        alphabet = alphabet.replace(letter.lower(), "")
-
-    return len(alphabet) == 0
+  return all(letter in sentence.lower() for letter in ascii_lowercase)
