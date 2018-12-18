@@ -10,27 +10,22 @@ func Frequency(s string) FreqMap {
 	return m
 }
 
-func FrequencyWithMap(s string, m FreqMap, done chan bool) FreqMap {
-	for _, r := range s {
-		m[r]++
+func ConcurrentFrequency(input []string) FreqMap {
+	freqChan := make(chan FreqMap)
+
+	for _, phrase := range input {
+		go func(phrase string) {
+			freqChan <- Frequency(phrase)
+		}(phrase)
 	}
 
-	done <- true
+	freqMap := make(FreqMap)
 
-	return m
-}
-
-func ConcurrentFrequency(s []string) FreqMap {
-	m := FreqMap{}
-	done := make(chan bool)
-
-	for index, _ := range s {
-		go FrequencyWithMap(s[index], m, done)
+	for range input {
+		for letter, freq := range <-freqChan {
+			freqMap[letter] += freq
+		}
 	}
 
-	for i := 0; i < len(s); i++ {
-		<-done
-	}
-
-	return m
+	return freqMap
 }
